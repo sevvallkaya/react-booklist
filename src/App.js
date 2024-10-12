@@ -5,20 +5,22 @@ import BookForm from './pages/BookForm';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BooksYouAdded from './components/BooksYouAdded';
+import { BooksProvider } from './context/BooksContext';
 
 
 function App() {
   return (
-    
-    <BrowserRouter>
-        <Header/> 
-        <Routes>
-          <Route path='/' element={<Books/>}></Route> 
-          <Route path='/books/:id' element={<BookDetails/>}></Route>
-          <Route path='/add-book' element={<BookForm/>}></Route>
-        </Routes>
-        <Footer/>
-    </BrowserRouter>
+    <BooksProvider>
+      <BrowserRouter>
+          <Header/> 
+          <Routes>
+            <Route path='/' element={<Books/>}></Route> 
+            <Route path='/books/:id' element={<BookDetails/>}></Route>
+            <Route path='/add-book' element={<BookForm/>}></Route>
+          </Routes>
+          <Footer/>
+      </BrowserRouter>
+    </BooksProvider>
   );
 }
 

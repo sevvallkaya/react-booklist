@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createBook } from '../services/bookService';
 import { useNavigate } from 'react-router-dom';
+import { useBooks } from '../context/BooksContext';
 
 const BookForm = ({onAddBook}) => { 
   const [book, setBook] = useState({
@@ -12,6 +13,8 @@ const BookForm = ({onAddBook}) => {
   });
 
   const navigate = useNavigate();
+  const {addBook} = useBooks();
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -41,7 +44,8 @@ const BookForm = ({onAddBook}) => {
     createBook(newBook)
       .then(response => {
         console.log('Book created:', response.data);
-        onAddBook(response.data);
+        //onAddBook(response.data);
+        addBook(response.data);
         navigate('/', {state: {newBook: response.data}});
       })
       .catch(error => console.log(error));

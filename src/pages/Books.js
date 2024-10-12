@@ -7,11 +7,12 @@ import BestSellers from "../components/BestSeller";
 import UpdateBookModal from "../components/UpdateBookModal";
 import SearchInput from "../components/SearchInput";
 import BookForm from "./BookForm";
+import { useBooks } from "../context/BooksContext";
 
 const Books = () => {
     const location = useLocation();
     const [books, setBooks] = useState([]);
-    const [addedBooks, setAddedBooks] = useState([]); 
+    const { addedBooks, setAddedBooks }= useBooks(); 
     const [allBooks, setAllBooks] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -19,11 +20,10 @@ const Books = () => {
 
     useEffect(() => {
         getBooks().then(response => {
+            console.log("API response:", response.data); 
             const currentBooks = response.data;
-            console.log(response.data)
             if (location.state?.newBook) {
                 const newBook = location.state.newBook;
-                console.log('yeni kitap var')
                 setAddedBooks(prevBooks => {
                     if (!prevBooks.find(book => book.id === newBook.id)) {
                         return [...prevBooks, newBook];
@@ -33,52 +33,97 @@ const Books = () => {
             }
     
             setBooks(currentBooks); 
-            console.log(currentBooks);
             setAllBooks(currentBooks); 
+            console.log(books, allBooks);
         }).catch(err => console.log(err));
     }, [location.state]);
 
     const handleSearch = (event) => {
         const term = event.target.value;
         setSearchTerm(term);
-    
+        const combinedBooks = [...allBooks, ...addedBooks];
+
         if (term === '') {
-            setBooks([...allBooks, ...addedBooks]);
+            setBooks(combinedBooks);
         } else {
-            const filteredBooks = allBooks.filter(book =>
+            const filteredBooks = combinedBooks.filter(book =>
                 book.name.toLowerCase().includes(term.toLowerCase())
             );
             setBooks(filteredBooks);
         }
     };
-
+    
     const handleAddBook = (newBook) => {
-        setAddedBooks(prevBooks => [...prevBooks, newBook]); // Yeni kitabı mevcut kitaplardaki diziye ekliyoruz
+        setAddedBooks(prevBooks => [...prevBooks, newBook]); 
       };
 
+
+    // const handleUpdate = (id, updatedData) => {
+
+    //     setAddedBooks(prevBooks =>
+    //         prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
+    //     );
+
+    //     if (books.find(book => book.id === id)) {
+    //         updateBook(id, updatedData)
+    //             .then(response => {
+    //                 setBooks(prevBooks =>
+    //                     prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
+    //                 );
+    //                 console.log("Book updated:", response.data);
+    //             })
+    //             .catch(error => console.log(error));
+    //     }
+    // };
+    
     const handleUpdate = (id, updatedData) => {
-        updateBook(id, updatedData)
-            .then(response => {
-                setBooks(prevBooks => 
-                    prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
-                );
-            })
-            .catch(error => console.log(error));
+        console.log("Updating book with ID:", id);
+        console.log("Updated data:", updatedData);
+
+        setAddedBooks(prevBooks => 
+            prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
+        );
+    
+        if (books.find(book => book.id === id)) {
+
+            updateBook(id, updatedData)
+                .then(response => {
+                    setBooks(prevBooks => 
+                        prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
+                    );
+                    console.log(id);
+                    console.log("Book updated:", response.data);
+                })
+                .catch(error => console.log(error));
+        } else {
+            setBooks(prevBooks => [
+                ...prevBooks,
+                { id, ...updatedData } 
+            ]);
+        }
     };
+    
 
 
     const handleDelete = (id) => {
         if (window.confirm("Are you sure you want to delete this book?")) {
-            deleteBook(id)
-                .then(() => {
-                    console.log('Book deleted');
-                    setBooks(prevBooks => prevBooks.filter(book => book.id !== id));
-                })
-                .catch(error => console.log(error));
+
+            setAddedBooks(prevBooks => prevBooks.filter(book => book.id !== id));
+            
+            if (books.find(book => book.id === id)) {
+                deleteBook(id)
+                    .then(() => {
+                        console.log('Book deleted');
+                        setBooks(prevBooks => prevBooks.filter(book => book.id !== id));
+                    })
+                    .catch(error => console.log(error));
+            }
         }
     };
+    
 
     const openModal = (book) => {
+        console.log("Opening modal for book:", book);
         setCurrentBook(book);
         setShowModal(true);
     };
@@ -90,26 +135,29 @@ const Books = () => {
 
 
     return (
-        <div className="container py-5 g-4 g-lg-5">
+        <div className="container">
             <SearchInput searchTerm={searchTerm} handleSearch={handleSearch}/>
             <div className="row">
-            
-            <BestSellers 
-                books={books} 
-                onUpdate={openModal} 
-                onDelete={handleDelete} />
+                {searchTerm === '' && addedBooks.length > 0 && 
+                    <BooksYouAdded 
+                        books={addedBooks} 
+                        onUpdate={openModal} 
+                        onDelete={handleDelete} 
+                />}
+                <BestSellers 
+                    books={books} 
+                    onUpdate={openModal} 
+                    onDelete={handleDelete} />
             </div>
-
-             {currentBook && (
-                <UpdateBookModal 
-                    show={showModal} 
-                    handleClose={closeModal} 
-                    book={currentBook} 
-                    handleUpdate={handleUpdate} 
-                />
-            )}
-            <BookForm onAddBook={handleAddBook}/>
-            {addedBooks.length > 0 && <BooksYouAdded books={addedBooks} />}
+                {/* <BookForm onAddBook={handleAddBook}/> */}
+                {currentBook && (
+                    <UpdateBookModal 
+                        show={showModal} 
+                        handleClose={closeModal} 
+                        book={currentBook} 
+                        handleUpdate={handleUpdate} 
+                    />
+                )}
         </div>
     );
 };

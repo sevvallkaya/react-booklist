@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const BooksYouAdded = ({ books }) => {
+const BooksYouAdded = ({ books, onUpdate, onDelete }) => {
     return (
-        <div className="pb-5">
+        <section className="pt-5 g-4 g-lg-5">
             <h2 className="display-6 text-light mb-4">Books You Added</h2>
             <div className="row">
                 {books.map(book => (
@@ -17,12 +17,20 @@ const BooksYouAdded = ({ books }) => {
                                 <Link to={`/books/${book.id}`} state={{book}} className="btn btn-primary w-100 mb-3">
                                     View Details
                                 </Link>
+                                <div className="d-flex justify-content-between">
+                                    <button className="btn btn-warning w-50" onClick={() => onUpdate(book)}>
+                                        Update
+                                    </button>
+                                    <button className="btn btn-danger ms-2 w-50" onClick={() => onDelete(book.id)}>
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 

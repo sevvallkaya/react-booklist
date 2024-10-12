@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 
 const BestSellers = ({ books, onUpdate, onDelete }) => {
     return (
-        <div className="pb-5">
+        <section className="pt-5 g-4 g-lg-5">
             <h2 className="display-6 text-light mb-4">Best Sellers</h2>
             <div className="row">
                 {books.map(book => (
-                    <div key={book.id} className="col-md-6 col-lg-3">
+                    <div key={book.id} book={book} className="col-md-6 col-lg-3">
                         <div className="card mb-4 p-3 rounded-4 bg-dark">
                             <img src={book.image} className="card-img-top rounded-3 img-fluid" alt={book.name} loading="lazy" />
                             <div className="card-body px-0">
@@ -19,7 +19,7 @@ const BestSellers = ({ books, onUpdate, onDelete }) => {
                                     View Details
                                 </Link>
                                 <div className="d-flex justify-content-between">
-                                    <button className="btn btn-warning w-50" onClick={() => onUpdate(book)}>
+                                    <button className="btn btn-warning w-50" onClick={() => onUpdate(book.id)}>
                                         Update
                                     </button>
                                     <button className="btn btn-danger ms-2 w-50" onClick={() => onDelete(book.id)}>
@@ -31,7 +31,7 @@ const BestSellers = ({ books, onUpdate, onDelete }) => {
                     </div>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 
