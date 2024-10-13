@@ -9,7 +9,7 @@ const BooksYouAdded = ({ books, onUpdate, onDelete }) => {
                 {books.map(book => (
                     <div key={book.id} className="col-lg-3">
                         <div className="card mb-4 p-3 rounded-4 bg-dark">
-                            <img src={book.image} className="card-img-top rounded-3 img-fluid" alt={book.name} loading="lazy" />
+                            <img src={book.image} style={{ maxHeight: '400px', width: '100%', objectFit:'cover' }}  className="card-img-top rounded-3 img-fluid" alt={book.name} loading="lazy" />
                             <div className="card-body px-0">
                                 <h5 className="card-title text-warning mb-0">{book.name}</h5>
                                 <p className="card-text text-light mb-0"><small><span className="fw-bold">by</span> {book.author}</small></p>

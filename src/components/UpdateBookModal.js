@@ -25,15 +25,17 @@ const UpdateBookModal = ({ show, handleClose, book, handleUpdate }) => {
     };
 
     const handleSubmit = () => {
-        console.log("Submitting update for book:", book);
-        if (typeof book === 'object' && book !== null && book.id) { 
+        console.log("Submitting update for book:", book, updatedBook); 
+        if (book && book.id) { 
             handleUpdate(book.id, updatedBook);
-            console.log("Updated Book:", book);
+            console.log(book, book.id, updatedBook);
         } else {
             console.error("Book or Book ID is undefined", { book });
         }
         handleClose();
     };
+
+    
     
     
 
@@ -82,7 +84,7 @@ const UpdateBookModal = ({ show, handleClose, book, handleUpdate }) => {
                     Update
                 </Button>
             </Modal.Footer>
-        </Modal>
+    </Modal>
     );
 };
 

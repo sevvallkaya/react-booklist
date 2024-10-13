@@ -12,7 +12,7 @@ import { useBooks } from "../context/BooksContext";
 const Books = () => {
     const location = useLocation();
     const [books, setBooks] = useState([]);
-    const { addedBooks, setAddedBooks }= useBooks(); 
+    const { addedBooks, setAddedBooks, updateBookContext, deleteBookContext }= useBooks(); 
     const [allBooks, setAllBooks] = useState([]); 
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -21,9 +21,12 @@ const Books = () => {
     useEffect(() => {
         getBooks().then(response => {
             console.log("API response:", response.data); 
-            const currentBooks = response.data;
+            const currentBooks = response.data; 
+            
+
             if (location.state?.newBook) {
                 const newBook = location.state.newBook;
+
                 setAddedBooks(prevBooks => {
                     if (!prevBooks.find(book => book.id === newBook.id)) {
                         return [...prevBooks, newBook];
@@ -34,7 +37,7 @@ const Books = () => {
     
             setBooks(currentBooks); 
             setAllBooks(currentBooks); 
-            console.log(books, allBooks);
+           
         }).catch(err => console.log(err));
     }, [location.state]);
 
@@ -56,33 +59,12 @@ const Books = () => {
     const handleAddBook = (newBook) => {
         setAddedBooks(prevBooks => [...prevBooks, newBook]); 
       };
-
-
-    // const handleUpdate = (id, updatedData) => {
-
-    //     setAddedBooks(prevBooks =>
-    //         prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
-    //     );
-
-    //     if (books.find(book => book.id === id)) {
-    //         updateBook(id, updatedData)
-    //             .then(response => {
-    //                 setBooks(prevBooks =>
-    //                     prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
-    //                 );
-    //                 console.log("Book updated:", response.data);
-    //             })
-    //             .catch(error => console.log(error));
-    //     }
-    // };
     
     const handleUpdate = (id, updatedData) => {
         console.log("Updating book with ID:", id);
         console.log("Updated data:", updatedData);
-
-        setAddedBooks(prevBooks => 
-            prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
-        );
+       
+        updateBookContext(id, updatedData);
     
         if (books.find(book => book.id === id)) {
 
@@ -104,11 +86,10 @@ const Books = () => {
     };
     
 
-
     const handleDelete = (id) => {
         if (window.confirm("Are you sure you want to delete this book?")) {
-
-            setAddedBooks(prevBooks => prevBooks.filter(book => book.id !== id));
+            
+            deleteBookContext(id);
             
             if (books.find(book => book.id === id)) {
                 deleteBook(id)
@@ -121,12 +102,25 @@ const Books = () => {
         }
     };
     
+    
+    const openModal = (bookIdOrObject) => {
+        let book;
 
-    const openModal = (book) => {
-        console.log("Opening modal for book:", book);
-        setCurrentBook(book);
-        setShowModal(true);
+        if (typeof bookIdOrObject === 'object') {
+            book = bookIdOrObject;
+        } else {
+            book = books.find(b => b.id === bookIdOrObject) || addedBooks.find(b => b.id === bookIdOrObject);
+        }
+    
+        if (book) {
+            console.log("Opening modal for book:", book);
+            setCurrentBook(book);
+            setShowModal(true);
+        } else {
+            console.log("Book not found:", bookIdOrObject);
+        }
     };
+    
 
     const closeModal = () => {
         setShowModal(false);
@@ -149,7 +143,6 @@ const Books = () => {
                     onUpdate={openModal} 
                     onDelete={handleDelete} />
             </div>
-                {/* <BookForm onAddBook={handleAddBook}/> */}
                 {currentBook && (
                     <UpdateBookModal 
                         show={showModal} 

@@ -14,8 +14,18 @@ export const BooksProvider = ({children}) => {
         setAddedBooks((prevBooks) => [...prevBooks, newBook]);
     };
 
+    const updateBookContext = (id, updatedData) => {
+        setAddedBooks((prevBooks) => 
+            prevBooks.map(book => book.id === id ? { ...book, ...updatedData } : book)
+        );
+    };
+
+    const deleteBookContext = (id) => {
+        setAddedBooks((prevBooks) => prevBooks.filter(book => book.id !== id));
+    };
+
     return (
-        <BooksContext.Provider value={{addedBooks, setAddedBooks, addBook}}>
+        <BooksContext.Provider value={{addedBooks, setAddedBooks, addBook, updateBookContext, deleteBookContext}}>
             {children}
         </BooksContext.Provider>
     )
