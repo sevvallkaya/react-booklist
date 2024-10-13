@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const BestSellers = ({ books, onUpdate, onDelete }) => {
+const BestSellers = ({ books, onViewDetails, onUpdate, onDelete }) => {
     return (
         <section className="py-5 g-4 g-lg-5">
             <h2 className="display-6 text-light mb-4">Best Sellers</h2>
@@ -14,9 +14,9 @@ const BestSellers = ({ books, onUpdate, onDelete }) => {
                                 <h5 className="card-title text-warning mb-0">{book.name}</h5>
                                 <p className="card-text text-light mb-0"><small><span className="fw-bold">by</span> {book.author}</small></p>
                                 <p className="card-text text-light fw-bold">${book.price}</p>
-                                <Link to={`/books/${book.id}`} state={{book}} className="btn btn-primary w-100 mb-3">
+                                <button  className="btn btn-primary w-100 mb-3" onClick={() => onViewDetails(book.id)} >
                                     View Details
-                                </Link>
+                                </button>
                                 <div className="d-flex justify-content-between">
                                     <button className="btn btn-warning w-50" onClick={() => onUpdate(book.id)}>
                                         Update

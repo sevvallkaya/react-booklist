@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getBooks, updateBook, deleteBook } from "../services/bookService";
-import { Link, useLocation } from "react-router-dom";
+import { getBooks, updateBook, deleteBook, getBookById } from "../services/bookService";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import BooksYouAdded from "../components/BooksYouAdded";
 import BestSellers from "../components/BestSeller";
@@ -11,6 +11,7 @@ import { useBooks } from "../context/BooksContext";
 
 const Books = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const [books, setBooks] = useState([]);
     const { addedBooks, setAddedBooks, updateBookContext, deleteBookContext }= useBooks(); 
     const [allBooks, setAllBooks] = useState([]); 
@@ -20,13 +21,10 @@ const Books = () => {
 
     useEffect(() => {
         getBooks().then(response => {
-            console.log("API response:", response.data); 
             const currentBooks = response.data; 
-            
-
+            console.log(response.data);
             if (location.state?.newBook) {
                 const newBook = location.state.newBook;
-
                 setAddedBooks(prevBooks => {
                     if (!prevBooks.find(book => book.id === newBook.id)) {
                         return [...prevBooks, newBook];
@@ -59,6 +57,22 @@ const Books = () => {
     const handleAddBook = (newBook) => {
         setAddedBooks(prevBooks => [...prevBooks, newBook]); 
       };
+    
+      
+    
+    
+    const handleViewDetails = (id) => {
+        getBookById(id)
+            .then(response => {
+                const bookDetails = response.data;
+                console.log("Book details:", bookDetails);
+                navigate(`/books/${id}`, { state: { book: bookDetails } });
+            })
+            .catch(error => {
+                console.error("Error fetching book details:", error);
+            });
+    };
+      
     
     const handleUpdate = (id, updatedData) => {
         console.log("Updating book with ID:", id);
@@ -140,6 +154,7 @@ const Books = () => {
                 />}
                 <BestSellers 
                     books={books} 
+                    onViewDetails={handleViewDetails}
                     onUpdate={openModal} 
                     onDelete={handleDelete} />
             </div>
